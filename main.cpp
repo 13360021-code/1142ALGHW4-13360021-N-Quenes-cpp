@@ -24,7 +24,14 @@ bool isSafe(int i, int row) {
     // 若無衝突，回傳 true
     // 否則回傳 false
 
-    return true; // 請修改
+    for (int j = 1; j < i; j++) {
+        // 1. 同一列：c[j] == row
+        // 2. 同一對角線：abs(c[j] - row) == abs(j - i)
+        if (c[j] == row || abs(c[j] - row) == abs(j - i)) {
+            return false; // 發生衝突
+        }
+    }
+    return true; // 請修改// 若無衝突，回傳 true
 }
 
 // ==============================
@@ -34,14 +41,26 @@ bool isSafe(int i, int row) {
 void backtrack(int i, int n) {
     // TODO:
     // 若 i > n，表示找到一組完整解
-    // 1. 將 c[1..n] 存入 solutions
-    // 2. return
-
+    if (i > n) {
+        // 1. 將 c[1..n] 存入 solutions
+        solutions.push_back(c);
+        // 2. return
+        return;
+    }
     // TODO:
     // 對 row = 1 到 n 逐一嘗試
     // 若 isSafe(i, row) 為 true：
     //   1. 設 c[i] = row
     //   2. 遞迴呼叫 backtrack(i + 1, n)
+    for (int row = 1; row <= n; row++) {
+        if (isSafe(i, row)) {
+            // 1. 設 c[i] = row
+            c[i] = row;
+            // 2. 遞迴呼叫 backtrack(i + 1, n)
+            backtrack(i + 1, n);
+            // 註：因為我們會直接覆蓋 c[i]，此處不需要特別做還原（Unchoose）動作
+        }
+    }
 }
 
 // ==============================
@@ -67,6 +86,11 @@ void printBoard(const vector<int>& sol) {
             // TODO:
             // 若第 col 欄皇后在第 row 列，印 "Q "
             // 否則印 ". "
+            if (sol[col] == row) {
+                cout << "Q ";
+            } else {
+                cout << ". ";
+            }
         }
         cout << "\n";
     }
@@ -81,7 +105,7 @@ void solveNQueens(int n) {
 
     // TODO:
     // 從第 1 欄開始回溯
-    // backtrack(1, n);
+    backtrack(1, n);
 
     cout << "n = " << n << "\n";
     cout << "Total solutions = " << solutions.size() << "\n";
@@ -90,14 +114,14 @@ void solveNQueens(int n) {
     if (!solutions.empty()) {
         cout << "First solution: ";
         // TODO:
-        // printSolution(solutions[0]);
+        printSolution(solutions[0]);
         cout << "\n";
     }
 
     if (solutions.size() >= 2) {
         cout << "Second solution: ";
         // TODO:
-        // printSolution(solutions[1]);
+        printSolution(solutions[1]);
         cout << "\n";
     }
 
@@ -105,7 +129,7 @@ void solveNQueens(int n) {
     if (n == 8 && !solutions.empty()) {
         cout << "\nOne board for n = 8:\n";
         // TODO:
-        // printBoard(solutions[0]);
+        printBoard(solutions[0]);
     }
 
     cout << "\n";
